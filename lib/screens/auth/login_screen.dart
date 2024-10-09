@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:workiway/services/auth_service.dart';
 import 'package:workiway/widgets/custom_button.dart';
-import 'package:workiway/widgets/custom_input_field.dart'; // El nuevo widget
+import 'package:workiway/widgets/custom_input_field.dart';
+import 'package:workiway/widgets/customer_bottom_navigation.dart';
+import 'package:workiway/widgets/provider_bottom_navigation.dart'; // El nuevo widget
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -18,6 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final FocusNode _passwordFocusNode = FocusNode();
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final AuthService _authService = AuthService(); // Instancia del AuthService
 
   String? errorMessage; // Para almacenar el mensaje de error
   String?
@@ -26,10 +29,10 @@ class _LoginScreenState extends State<LoginScreen> {
   // Función para iniciar sesión y verificar el correo
   Future<void> iniciarSesion(BuildContext context) async {
     setState(() {
-      errorMessage = null; // Limpiar el mensaje de error al iniciar sesión
-      resetPasswordMessage =
-          null; // Limpiar el mensaje de restablecimiento de contraseña
+      errorMessage = null;
+      resetPasswordMessage = null;
     });
+
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: emailController.text.trim(),
@@ -38,21 +41,37 @@ class _LoginScreenState extends State<LoginScreen> {
 
       User? user = userCredential.user;
 
-      // Verificar si el correo ha sido verificado
       if (user != null && !user.emailVerified) {
         setState(() {
           errorMessage = 'Debes verificar tu correo antes de iniciar sesión.';
         });
         await _auth.signOut();
       } else {
-        await AuthService().actualizarEmailVerificado(user!);
-        // Redirigir a la siguiente pantalla, si todo está bien
-        Navigator.pushNamed(context, '/dashboard'); // Cambia según tu ruta
+        await _authService.actualizarEmailVerificado(user!);
+
+        bool esCliente = await _authService.esCliente(user.uid);
+
+        if (esCliente) {
+          // Redirigir al `CustomerBottomNavigation` en lugar de a una pantalla individual
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CustomerBottomNavigation(),
+            ),
+          );
+        } else {
+          // Redirigir al `ProviderBottomNavigation` en lugar de a una pantalla individual
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ProviderBottomNavigation(),
+            ),
+          );
+        }
       }
     } on FirebaseAuthException catch (e) {
       setState(() {
-        errorMessage =
-            _traducirErrorFirebase(e.code); // Traduce el mensaje de error
+        errorMessage = _traducirErrorFirebase(e.code);
       });
     }
   }
