@@ -8,6 +8,8 @@ import 'package:workiway/screens/customer/reservations_screen.dart';
 import 'package:workiway/screens/customer/profile_screen.dart';
 
 class CustomerBottomNavigation extends StatefulWidget {
+  const CustomerBottomNavigation({super.key});
+
   @override
   _CustomerBottomNavigationState createState() =>
       _CustomerBottomNavigationState();
@@ -45,8 +47,8 @@ class _CustomerBottomNavigationState extends State<CustomerBottomNavigation> {
       ),
       body: pages[activePageIndex],
       bottomNavigationBar: Container(
-        margin: EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
-        padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+        margin: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
         height: ScreenUtil().setHeight(65.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20.0),
@@ -94,7 +96,7 @@ Widget getBottomWidgetItem(
     child: IconButton(
       icon: Icon(
         icon,
-        color: isActive ? Colors.white : Color.fromRGBO(156, 166, 201, 1),
+        color: isActive ? Colors.white : const Color.fromRGBO(156, 166, 201, 1),
       ),
       onPressed: onPressed,
     ),

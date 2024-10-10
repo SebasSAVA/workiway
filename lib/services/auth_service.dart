@@ -25,7 +25,7 @@ class AuthService {
       // Enviar correo de verificación
       await credencialesUsuario.user?.sendEmailVerification();
 
-      // Guardar datos en Firestore en colecciones separadas
+      // Crear datos básicos y campos adicionales vacíos para cliente
       if (tipoUsuario == 'Cliente') {
         await _firestore
             .collection('clientes')
@@ -38,8 +38,14 @@ class AuthService {
           'tipoUsuario': tipoUsuario,
           'uid': credencialesUsuario.user!.uid,
           'emailVerified': false,
+          'fotoPerfil': null, // Campo vacío inicialmente
+          'departamento': null, // Campo vacío inicialmente
+          'provincia': null, // Campo vacío inicialmente
+          'direccion': null, // Campo vacío inicialmente
         });
-      } else if (tipoUsuario == 'Proveedor') {
+      }
+      // Crear datos básicos y campos adicionales vacíos para proveedor
+      else if (tipoUsuario == 'Proveedor') {
         await _firestore
             .collection('proveedores')
             .doc(credencialesUsuario.user!.uid)
@@ -51,6 +57,13 @@ class AuthService {
           'tipoUsuario': tipoUsuario,
           'uid': credencialesUsuario.user!.uid,
           'emailVerified': false,
+          'fotoPerfil': null, // Campo vacío inicialmente
+          'departamentos':
+              [], // Lista vacía inicialmente para varios departamentos
+          'provincias': [], // Lista vacía inicialmente para varias provincias
+          'porqueElegirme': null, // Campo vacío inicialmente
+          'sobreTi': null, // Campo vacío inicialmente
+          'anexiones': [], // Lista vacía inicialmente para anexiones
         });
       }
 

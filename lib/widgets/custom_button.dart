@@ -7,8 +7,9 @@ class CustomButton extends StatelessWidget {
   final VoidCallback onPressed;
   final ButtonType type;
 
-  CustomButton(
-      {required this.text,
+  const CustomButton(
+      {super.key,
+      required this.text,
       required this.onPressed,
       this.type = ButtonType.PRIMARY});
 
@@ -17,11 +18,11 @@ class CustomButton extends StatelessWidget {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor:
-            type == ButtonType.PRIMARY ? Color(0xFF438ef9) : Colors.white,
-        padding: EdgeInsets.symmetric(vertical: 12),
+            type == ButtonType.PRIMARY ? const Color(0xFF438ef9) : Colors.white,
+        padding: const EdgeInsets.symmetric(vertical: 12),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8.0),
-          side: BorderSide(
+          side: const BorderSide(
               color: Color(0xFF438ef9),
               width: 2), // Borde azul para el botón OUTLINE
         ),
@@ -33,7 +34,7 @@ class CustomButton extends StatelessWidget {
           fontSize: 18,
           color: type == ButtonType.PRIMARY
               ? Colors.white
-              : Color(0xFF438ef9), // Color de texto según el botón
+              : const Color(0xFF438ef9), // Color de texto según el botón
         ),
       ),
     );

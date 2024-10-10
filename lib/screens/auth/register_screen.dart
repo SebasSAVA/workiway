@@ -6,6 +6,8 @@ import '../../widgets/custom_input_field.dart'; // El nuevo widget personalizado
 import '../../widgets/custom_dropdown.dart';
 
 class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
+
   @override
   _PantallaRegistroState createState() => _PantallaRegistroState();
 }
@@ -87,7 +89,7 @@ class _PantallaRegistroState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF438ef9),
+      backgroundColor: const Color(0xFF438ef9),
       body: SafeArea(
         child: Stack(
           children: [
@@ -112,14 +114,14 @@ class _PantallaRegistroState extends State<RegisterScreen> {
                     onTap: () {
                       Navigator.of(context).pop();
                     },
-                    child: Icon(
+                    child: const Icon(
                       Icons.arrow_back_ios,
                       color: Colors.white,
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
                   child: Text(
                     'Regístrate en tu cuenta',
                     style: TextStyle(
@@ -129,16 +131,16 @@ class _PantallaRegistroState extends State<RegisterScreen> {
                     ),
                   ),
                 ),
-                SizedBox(height: 50),
+                const SizedBox(height: 50),
                 Expanded(
                   child: Container(
                     width: double.infinity,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.white,
                       borderRadius:
                           BorderRadius.vertical(top: Radius.circular(30.0)),
                     ),
-                    padding: EdgeInsets.all(24.0),
+                    padding: const EdgeInsets.all(24.0),
                     child: SingleChildScrollView(
                       child: Form(
                         key: _formKey,
@@ -161,7 +163,7 @@ class _PantallaRegistroState extends State<RegisterScreen> {
                                 return null;
                               },
                             ),
-                            SizedBox(height: 20),
+                            const SizedBox(height: 20),
 
                             // Campo Nombre
                             CustomInputField(
@@ -184,7 +186,7 @@ class _PantallaRegistroState extends State<RegisterScreen> {
                               },
                             ),
 
-                            SizedBox(height: 20),
+                            const SizedBox(height: 20),
 
                             // Campo Apellidos
                             CustomInputField(
@@ -207,7 +209,7 @@ class _PantallaRegistroState extends State<RegisterScreen> {
                               },
                             ),
 
-                            SizedBox(height: 20),
+                            const SizedBox(height: 20),
 
                             // Campo Teléfono
                             CustomInputField(
@@ -231,7 +233,7 @@ class _PantallaRegistroState extends State<RegisterScreen> {
                               },
                             ),
 
-                            SizedBox(height: 20),
+                            const SizedBox(height: 20),
 
                             // Campo Correo Electrónico
                             CustomInputField(
@@ -253,7 +255,7 @@ class _PantallaRegistroState extends State<RegisterScreen> {
                               },
                             ),
 
-                            SizedBox(height: 20),
+                            const SizedBox(height: 20),
 
                             // Campo Contraseña
                             CustomInputField(
@@ -314,7 +316,7 @@ class _PantallaRegistroState extends State<RegisterScreen> {
                               ],
                             ),
 
-                            SizedBox(height: 20),
+                            const SizedBox(height: 20),
 
                             // Confirmar Contraseña
                             CustomInputField(
@@ -332,7 +334,7 @@ class _PantallaRegistroState extends State<RegisterScreen> {
                               },
                             ),
 
-                            SizedBox(height: 40),
+                            const SizedBox(height: 40),
 
                             // Botón de registro
                             SizedBox(

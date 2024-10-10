@@ -10,7 +10,8 @@ class InputField extends StatelessWidget {
   final Function(String)?
       onChanged; // Agregar este parámetro para admitir onChanged
 
-  InputField({
+  const InputField({
+    super.key,
     required this.controller,
     required this.labelText,
     this.obscureText = false,
@@ -27,9 +28,9 @@ class InputField extends StatelessWidget {
       children: [
         Text(
           labelText,
-          style: TextStyle(fontSize: 16.0, color: Colors.black54),
+          style: const TextStyle(fontSize: 16.0, color: Colors.black54),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         TextFormField(
           controller: controller,
           obscureText: obscureText,

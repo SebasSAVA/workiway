@@ -12,7 +12,8 @@ class CustomInputField extends StatelessWidget {
   final FocusNode? focusNode; // Soporte para FocusNode
   final Function(String)? onFieldSubmitted; // Soporte para onFieldSubmitted
 
-  CustomInputField({
+  const CustomInputField({
+    super.key,
     required this.controller,
     required this.labelText,
     this.obscureText = false,
@@ -32,9 +33,9 @@ class CustomInputField extends StatelessWidget {
       children: [
         Text(
           labelText,
-          style: TextStyle(fontSize: 16.0, color: Colors.black54),
+          style: const TextStyle(fontSize: 16.0, color: Colors.black54),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         TextFormField(
           controller: controller,
           obscureText: obscureText,

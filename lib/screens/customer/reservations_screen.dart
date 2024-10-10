@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 class CustomerReservationsScreen extends StatelessWidget {
+  const CustomerReservationsScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return const Center(
       child: Text('Pantalla de Reservas (Cliente)'),
     );
   }

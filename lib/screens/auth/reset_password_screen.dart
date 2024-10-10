@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:workiway/widgets/custom_button.dart'; // Suponiendo que tienes este widget
 
 class ResetPasswordScreen extends StatefulWidget {
+  const ResetPasswordScreen({super.key});
+
   @override
   _ResetPasswordScreenState createState() => _ResetPasswordScreenState();
 }
@@ -45,7 +47,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF438ef9),
+      backgroundColor: const Color(0xFF438ef9),
       body: SafeArea(
         child: Stack(
           children: [
@@ -70,14 +72,14 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     onTap: () {
                       Navigator.of(context).pop();
                     },
-                    child: Icon(
+                    child: const Icon(
                       Icons.arrow_back_ios,
                       color: Colors.white,
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
                   child: Text(
                     'Restablecer Contraseña',
                     style: TextStyle(
@@ -87,26 +89,26 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     ),
                   ),
                 ),
-                SizedBox(height: 50),
+                const SizedBox(height: 50),
                 Expanded(
                   child: Container(
                     width: double.infinity,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.white,
                       borderRadius:
                           BorderRadius.vertical(top: Radius.circular(30.0)),
                     ),
-                    padding: EdgeInsets.all(24.0),
+                    padding: const EdgeInsets.all(24.0),
                     child: SingleChildScrollView(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             'Introduce tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.',
                             style: TextStyle(
                                 fontSize: 16.0, color: Colors.black87),
                           ),
-                          SizedBox(height: 20),
+                          const SizedBox(height: 20),
 
                           // Campo de correo electrónico
                           TextField(
@@ -123,7 +125,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
                           // Mostrar mensaje de error o confirmación
                           if (errorMessage != null) ...[
-                            SizedBox(height: 20),
+                            const SizedBox(height: 20),
                             Text(
                               errorMessage!,
                               style: TextStyle(
@@ -135,7 +137,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                             ),
                           ],
 
-                          SizedBox(height: 40.0),
+                          const SizedBox(height: 40.0),
 
                           // Botón para enviar el correo de restablecimiento
                           SizedBox(

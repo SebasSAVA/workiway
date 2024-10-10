@@ -1,11 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart'; // Importa ScreenUtil
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:workiway/screens/auth/home_screen.dart';
 import 'package:workiway/screens/auth/login_screen.dart';
 import 'package:workiway/screens/auth/register_screen.dart';
 import 'package:workiway/screens/auth/reset_password_screen.dart';
+import 'package:workiway/services/init_service.dart'; // Importa InitService
 
 // Pantallas para cliente
 import 'package:workiway/screens/customer/services_screen.dart';
@@ -22,10 +23,17 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(); // Inicializa Firebase aquí
 
+  // Inicializa las colecciones antes de que la aplicación cargue
+  InitService initService = InitService();
+  await initService
+      .initializeCollections(); // Aquí llamamos al servicio de inicialización
+
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
@@ -37,14 +45,14 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           title: 'Workiway',
           theme: ThemeData(
-            primaryColor: Color(0xFF438ef9),
+            primaryColor: const Color(0xFF438ef9),
           ),
-          localizationsDelegates: [
+          localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
           ],
-          supportedLocales: [
-            const Locale('en'), // Inglés
+          supportedLocales: const [
+            Locale('en'), // Inglés
           ],
           locale:
               const Locale('es'), // Establecer el español como predeterminado

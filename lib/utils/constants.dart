@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Constants {
-  static final Color primaryColor = Color(0xFF438ef9);
+  static final Color primaryColor = const Color(0xFF438ef9);
 
   static final List<String> departamentos = ['Arequipa'];
 

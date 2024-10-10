@@ -7,6 +7,8 @@ import 'package:workiway/widgets/customer_bottom_navigation.dart';
 import 'package:workiway/widgets/provider_bottom_navigation.dart'; // El nuevo widget
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -34,6 +36,14 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
+      // Verificar que los campos no estén vacíos antes de intentar iniciar sesión
+      if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+        setState(() {
+          errorMessage = 'Por favor, ingresa un correo y una contraseña.';
+        });
+        return;
+      }
+
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
@@ -73,6 +83,11 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         errorMessage = _traducirErrorFirebase(e.code);
       });
+    } catch (e) {
+      // Captura cualquier otro error no relacionado con FirebaseAuth
+      setState(() {
+        errorMessage = 'Error inesperado: ${e.toString()}';
+      });
     }
   }
 
@@ -111,6 +126,8 @@ class _LoginScreenState extends State<LoginScreen> {
         return 'Este usuario ha sido deshabilitado.';
       case 'too-many-requests':
         return 'Demasiados intentos fallidos. Inténtalo de nuevo más tarde.';
+      case 'network-request-failed':
+        return 'Hubo un problema de conexión a internet. Inténtalo más tarde.';
       default:
         return 'Ocurrió un error desconocido. Inténtalo de nuevo.';
     }
@@ -119,7 +136,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF438ef9), // Color principal
+      backgroundColor: const Color(0xFF438ef9), // Color principal
       body: SafeArea(
         child: Stack(
           children: [
@@ -144,14 +161,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     onTap: () {
                       Navigator.of(context).pop();
                     },
-                    child: Icon(
+                    child: const Icon(
                       Icons.arrow_back_ios,
                       color: Colors.white,
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
                   child: Text(
                     'Inicia sesión en tu cuenta',
                     style: TextStyle(
@@ -161,21 +178,21 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-                SizedBox(height: 50),
+                const SizedBox(height: 50),
                 Expanded(
                   child: Container(
                     width: double.infinity,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.white,
                       borderRadius:
                           BorderRadius.vertical(top: Radius.circular(30.0)),
                     ),
-                    padding: EdgeInsets.all(24.0),
+                    padding: const EdgeInsets.all(24.0),
                     child: SingleChildScrollView(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(height: 20),
+                          const SizedBox(height: 20),
 
                           // Campo de correo electrónico con teclado personalizado
                           CustomInputField(
@@ -194,7 +211,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             },
                           ),
 
-                          SizedBox(height: 20.0),
+                          const SizedBox(height: 20.0),
 
                           // Campo de contraseña
                           CustomInputField(
@@ -209,10 +226,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           // Mostrar mensaje de error en caso de haber alguno
                           if (errorMessage != null) ...[
-                            SizedBox(height: 20.0),
+                            const SizedBox(height: 20.0),
                             Text(
                               errorMessage!,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Colors.red,
                                 fontSize: 14.0,
                               ),
@@ -221,17 +238,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           // Mostrar mensaje de éxito en restablecimiento de contraseña
                           if (resetPasswordMessage != null) ...[
-                            SizedBox(height: 20.0),
+                            const SizedBox(height: 20.0),
                             Text(
                               resetPasswordMessage!,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Colors.green,
                                 fontSize: 14.0,
                               ),
                             ),
                           ],
 
-                          SizedBox(height: 20.0),
+                          const SizedBox(height: 20.0),
                           Align(
                             alignment: Alignment.centerRight,
                             child: GestureDetector(
@@ -239,7 +256,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 Navigator.pushNamed(context,
                                     '/reset-password'); // Redirige a la nueva pantalla
                               },
-                              child: Text(
+                              child: const Text(
                                 '¿Olvidaste tu contraseña?',
                                 style: TextStyle(
                                   color: Color(0xFF438ef9),
@@ -249,7 +266,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
 
-                          SizedBox(height: 40.0),
+                          const SizedBox(height: 40.0),
                           SizedBox(
                             width: double.infinity,
                             child: CustomButton(
