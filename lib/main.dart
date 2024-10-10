@@ -58,10 +58,12 @@ class MyApp extends StatelessWidget {
               const Locale('es'), // Establecer el español como predeterminado
           initialRoute: '/home', // O la ruta que desees como inicial
           routes: {
-            '/home': (context) => HomeScreen(),
-            '/login': (context) => LoginScreen(),
-            '/register': (context) => RegisterScreen(),
-            '/reset-password': (context) => ResetPasswordScreen(),
+            '/home': (context) => HomeScreen(), // Pantalla principal de la app
+            '/login': (context) =>
+                LoginScreen(), // Pantalla de inicio de sesión
+            '/register': (context) => RegisterScreen(), // Pantalla de registro
+            '/reset-password': (context) =>
+                ResetPasswordScreen(), // Pantalla de restablecimiento de contraseña
             '/customer-services': (context) =>
                 ServicesScreen(), // Pantalla de servicios del cliente
             '/provider-reservations': (context) =>

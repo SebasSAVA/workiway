@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:workiway/services/auth_service.dart';
 import '../../widgets/ConfirmationScreen.dart';
 import '../../widgets/custom_button.dart';
-import '../../widgets/custom_input_field.dart'; // El nuevo widget personalizado
+import '../../widgets/custom_input_field.dart';
 import '../../widgets/custom_dropdown.dart';
+import '../../widgets/password_input_field.dart'; // El widget de contraseña con ícono de ojo
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -33,7 +34,6 @@ class _PantallaRegistroState extends State<RegisterScreen> {
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  // FocusNodes para gestionar el foco entre los campos
   final FocusNode _nombreFocusNode = FocusNode();
   final FocusNode _apellidosFocusNode = FocusNode();
   final FocusNode _telefonoFocusNode = FocusNode();
@@ -257,14 +257,17 @@ class _PantallaRegistroState extends State<RegisterScreen> {
 
                             const SizedBox(height: 20),
 
-                            // Campo Contraseña
-                            CustomInputField(
+                            // Campo Contraseña con validaciones y ícono de ojo
+                            PasswordInputField(
                               controller: passwordController,
-                              labelText: 'Contraseña (Obligatorio)',
-                              obscureText: true,
-                              hintText: 'Ingresa tu contraseña',
                               focusNode: _passwordFocusNode,
+                              labelText: 'Contraseña (Obligatorio)',
+                              hintText: 'Ingresa tu contraseña',
                               textInputAction: TextInputAction.next,
+                              onFieldSubmitted: (_) {
+                                FocusScope.of(context)
+                                    .requestFocus(_confirmarPasswordFocusNode);
+                              },
                               onChanged: validarPassword,
                               validator: (value) {
                                 if (value == null ||
@@ -275,10 +278,6 @@ class _PantallaRegistroState extends State<RegisterScreen> {
                                   return 'La contraseña no cumple con los requisitos.';
                                 }
                                 return null;
-                              },
-                              onFieldSubmitted: (_) {
-                                FocusScope.of(context)
-                                    .requestFocus(_confirmarPasswordFocusNode);
                               },
                             ),
 
@@ -319,12 +318,11 @@ class _PantallaRegistroState extends State<RegisterScreen> {
                             const SizedBox(height: 20),
 
                             // Confirmar Contraseña
-                            CustomInputField(
+                            PasswordInputField(
                               controller: confirmarPasswordController,
-                              labelText: 'Confirmar Contraseña (Obligatorio)',
-                              obscureText: true,
-                              hintText: 'Confirma tu contraseña',
                               focusNode: _confirmarPasswordFocusNode,
+                              labelText: 'Confirmar Contraseña (Obligatorio)',
+                              hintText: 'Confirma tu contraseña',
                               textInputAction: TextInputAction.done,
                               validator: (value) {
                                 if (value != passwordController.text) {
