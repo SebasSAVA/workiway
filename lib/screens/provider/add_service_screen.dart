@@ -44,6 +44,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   // Variables para mensajes de error específicos
   String? _generalError; // Mensaje de error general
 
+  // Lista de distritos filtrados
+  List<String> _availableDistricts = [];
+
   @override
   void initState() {
     super.initState();
@@ -62,13 +65,36 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       setState(() {
         _hasNoLocationDefined = _providerData?['provincias'] == null ||
             (_providerData?['provincias']?.isEmpty == true);
-        _selectedDistricts =
-            List<String>.from(_providerData?['distritos'] ?? []);
       });
+
+      // Cargar distritos basados en las provincias elegidas
+      _availableDistricts = _getAvailableDistricts();
     } catch (e) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Error al cargar datos: $e')));
     }
+  }
+
+  List<String> _getAvailableDistricts() {
+    // Verifica si hay provincias definidas
+    if (_providerData?['provincias'] == null ||
+        (_providerData!['provincias'] as List).isEmpty) {
+      return []; // Retorna lista vacía si no hay provincias
+    }
+
+    List<String> districts = [];
+    List<String> provinces =
+        List<String>.from(_providerData!['provincias']); // Convertir a lista
+
+    // Filtrar distritos solo de las provincias elegidas
+    for (var province in provinces) {
+      if (Constants.distritos.containsKey(province)) {
+        districts
+            .addAll(Constants.distritos[province]!); // Agregar los distritos
+      }
+    }
+
+    return districts; // Retornar los distritos filtrados
   }
 
   void _selectImage() {
@@ -148,6 +174,10 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     if (_descriptionController.text.isEmpty) {
       // Verificar descripción
       isValid = false;
+    }
+
+    if (_selectedDistricts.isEmpty) {
+      isValid = false; // Asegurarse de que se seleccionen distritos
     }
 
     if (_availability == null || _availability!.isEmpty) {
@@ -311,7 +341,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
             const SizedBox(height: 10),
             MultiSelectDropdown(
               labelText: 'Seleccionar Distritos (obligatorio)',
-              items: Constants.distritos.values.expand((x) => x).toList(),
+              items: _availableDistricts,
               selectedItems: _selectedDistricts,
               onChanged: (List<String> selected) {
                 setState(() {

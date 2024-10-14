@@ -175,7 +175,7 @@ class _PantallaRegistroState extends State<RegisterScreen> {
                               validator: (value) {
                                 if (value == null ||
                                     value.isEmpty ||
-                                    !RegExp(r'^[a-zA-Z]+$').hasMatch(value)) {
+                                    !RegExp(r'^[a-zA-Z ]+$').hasMatch(value)) {
                                   return 'Por favor, ingresa un nombre válido.';
                                 }
                                 return null;
@@ -198,7 +198,7 @@ class _PantallaRegistroState extends State<RegisterScreen> {
                               validator: (value) {
                                 if (value == null ||
                                     value.isEmpty ||
-                                    !RegExp(r'^[a-zA-Z]+$').hasMatch(value)) {
+                                    !RegExp(r'^[a-zA-Z ]+$').hasMatch(value)) {
                                   return 'Por favor, ingresa apellidos válidos.';
                                 }
                                 return null;
