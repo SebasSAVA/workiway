@@ -68,6 +68,7 @@ class MyApp extends StatelessWidget {
                 ServicesScreen(), // Pantalla de servicios del cliente
             '/provider-reservations': (context) =>
                 ProviderReservationsScreen(), // Pantalla de reservas del proveedor
+            '/profile-screen-provider': (context) => ProviderProfileScreen()
           },
         );
       },

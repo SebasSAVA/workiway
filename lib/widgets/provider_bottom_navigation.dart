@@ -41,7 +41,11 @@ class _ProviderBottomNavigationState extends State<ProviderBottomNavigation> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(appBarTitles[activePageIndex]),
+        backgroundColor: const Color(0xFF438ef9), // Fondo azul
+        title: Text(
+          appBarTitles[activePageIndex],
+          style: const TextStyle(color: Colors.white), // Texto en blanco
+        ),
         automaticallyImplyLeading: false, // Elimina el botón "back"
       ),
       body: pages[activePageIndex],

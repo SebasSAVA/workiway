@@ -42,7 +42,11 @@ class _CustomerBottomNavigationState extends State<CustomerBottomNavigation> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(appBarTitles[activePageIndex]),
+        backgroundColor: const Color(0xFF438ef9), // Fondo azul
+        title: Text(
+          appBarTitles[activePageIndex],
+          style: const TextStyle(color: Colors.white), // Título en blanco
+        ),
         automaticallyImplyLeading: false,
       ),
       body: pages[activePageIndex],
