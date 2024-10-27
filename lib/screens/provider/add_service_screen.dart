@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart'; // Importa Firebase Storage
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:workiway/screens/provider/provider_services_screen.dart';
+import 'package:workiway/widgets/ConfirmationDialogWithButtons.dart';
 import 'package:workiway/widgets/ConfirmationScreen.dart';
 import 'package:workiway/widgets/custom_button.dart';
 import 'package:workiway/widgets/custom_dropdown.dart';
@@ -16,14 +18,25 @@ import 'package:workiway/services/service_service.dart';
 
 class AddServiceScreen extends StatefulWidget {
   final String? userUid;
+  final bool isEditing; // Indica si es edición o creación
+  final Map<String, dynamic>? existingService; // Datos del servicio a editar
+  final String? serviceId; // ID del servicio a editar
 
-  const AddServiceScreen({Key? key, this.userUid}) : super(key: key);
+  const AddServiceScreen({
+    Key? key,
+    this.userUid,
+    this.isEditing = false, // Valor por defecto es 'false' (creación)
+    this.existingService,
+    this.serviceId, // Recibe el ID del servicio explícitamente
+  }) : super(key: key);
 
   @override
   _AddServiceScreenState createState() => _AddServiceScreenState();
 }
 
 class _AddServiceScreenState extends State<AddServiceScreen> {
+  String? _serviceId;
+  // Controladores inicializados con valores si es edición
   final TextEditingController _serviceNameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
@@ -47,12 +60,40 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   // Lista de distritos filtrados
   List<String> _availableDistricts = [];
 
+  // Inicialización de variables según sea creación o edición
   @override
   void initState() {
     super.initState();
-    final User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      _cargarDatosProveedor();
+
+    _serviceId = widget.existingService?['id'] ?? widget.serviceId;
+
+    print('ID del servicio en AddServiceScreen: $_serviceId');
+    print('Datos completos del servicio: ${widget.existingService}');
+    _serviceId = (_serviceId ?? '').trim();
+
+    _cargarDatosProveedor();
+
+    if (widget.isEditing && widget.existingService != null) {
+      _serviceNameController.text = widget.existingService!['name'] ?? '';
+      _descriptionController.text =
+          widget.existingService!['description'] ?? '';
+      _priceController.text = widget.existingService!['price'].toString();
+      _selectedCategory = widget.existingService!['category'];
+      _selectedSubCategory = widget.existingService!['subCategory'];
+      _selectedDistricts =
+          List<String>.from(widget.existingService!['districts'] ?? []);
+      _selectedPaymentModalidad = widget.existingService!['paymentModalidad'];
+      _isPaymentAdvance = widget.existingService!['isPaymentAdvance'] ?? false;
+
+      if (widget.existingService!['availability'] != null) {
+        _availability = (widget.existingService!['availability']
+                as Map<String, dynamic>)
+            .map(
+                (key, value) => MapEntry(key, Map<String, String>.from(value)));
+      }
+
+      _paymentPercentageController.text =
+          widget.existingService!['paymentPercentage'] ?? '';
     }
   }
 
@@ -65,36 +106,33 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       setState(() {
         _hasNoLocationDefined = _providerData?['provincias'] == null ||
             (_providerData?['provincias']?.isEmpty == true);
-      });
 
-      // Cargar distritos basados en las provincias elegidas
-      _availableDistricts = _getAvailableDistricts();
+        // Cargar los distritos correspondientes a las provincias seleccionadas
+        _availableDistricts = _getAvailableDistricts();
+      });
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error al cargar datos: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al cargar datos: $e')),
+      );
     }
   }
 
   List<String> _getAvailableDistricts() {
-    // Verifica si hay provincias definidas
     if (_providerData?['provincias'] == null ||
         (_providerData!['provincias'] as List).isEmpty) {
       return []; // Retorna lista vacía si no hay provincias
     }
 
     List<String> districts = [];
-    List<String> provinces =
-        List<String>.from(_providerData!['provincias']); // Convertir a lista
+    List<String> provinces = List<String>.from(_providerData!['provincias']);
 
-    // Filtrar distritos solo de las provincias elegidas
+    // Agrega los distritos correspondientes a las provincias seleccionadas
     for (var province in provinces) {
       if (Constants.distritos.containsKey(province)) {
-        districts
-            .addAll(Constants.distritos[province]!); // Agregar los distritos
+        districts.addAll(Constants.distritos[province]!);
       }
     }
-
-    return districts; // Retornar los distritos filtrados
+    return districts;
   }
 
   void _selectImage() {
@@ -159,6 +197,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       _generalError = null;
     });
 
+    // Validar campos obligatorios
     if (_serviceNameController.text.isEmpty) {
       isValid = false;
     }
@@ -172,20 +211,21 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     }
 
     if (_descriptionController.text.isEmpty) {
-      // Verificar descripción
       isValid = false;
     }
 
     if (_selectedDistricts.isEmpty) {
-      isValid = false; // Asegurarse de que se seleccionen distritos
+      isValid = false;
     }
 
     if (_availability == null || _availability!.isEmpty) {
       isValid = false;
     }
 
-    if (_selectedImage == null) {
-      // Verificar imagen
+    // Validar que exista una imagen (ya sea nueva o existente)
+    if (_selectedImage == null &&
+        (widget.existingService == null ||
+            widget.existingService?['imageUrl'] == null)) {
       isValid = false;
     }
 
@@ -199,21 +239,66 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     return isValid;
   }
 
+  void _showConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ConfirmationDialogWithButtons(
+          mensaje: widget.isEditing
+              ? '¿Estás seguro de que deseas actualizar este servicio?'
+              : '¿Estás seguro de que deseas crear este servicio?',
+          icono: Icons.warning,
+          onAcceptPressed: () async {
+            Navigator.of(context).pop(); // Cerrar el diálogo
+            await _saveService(); // Llamar al guardado o actualización
+          },
+          onCancelPressed: () {
+            Navigator.of(context).pop(); // Cerrar el diálogo
+          },
+        );
+      },
+    );
+  }
+
+  void _showSuccessDialog(String mensaje) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ConfirmationScreen(
+          mensaje: mensaje,
+          icono: Icons.check_circle,
+          onButtonPressed: () {
+            Navigator.of(context).pop(); // Cerrar el diálogo de éxito
+            Navigator.pop(context); // Volver a la pantalla anterior
+          },
+        );
+      },
+    );
+  }
+
+  // Método para guardar o actualizar el servicio
   Future<void> _saveService() async {
-    if (!_validateFields()) return; // Validar campos
+    if (!_validateFields()) return;
+    print('Intentando guardar o actualizar el servicio con ID: $_serviceId');
 
     try {
       String? imageUrl;
 
-      // Guardar la imagen en Firebase Storage si se seleccionó
       if (_selectedImage != null) {
-        final Reference storageReference = FirebaseStorage.instance
-            .ref()
-            .child('services/${DateTime.now().millisecondsSinceEpoch}');
-        final UploadTask uploadTask =
-            storageReference.putFile(File(_selectedImage!.path));
-        await uploadTask;
-        imageUrl = await storageReference.getDownloadURL();
+        final File imageFile = File(_selectedImage!.path);
+
+        if (await imageFile.exists()) {
+          final Reference storageReference = FirebaseStorage.instance
+              .ref()
+              .child('services/${DateTime.now().millisecondsSinceEpoch}');
+          final UploadTask uploadTask = storageReference.putFile(imageFile);
+          await uploadTask;
+          imageUrl = await storageReference.getDownloadURL();
+        } else {
+          throw Exception('No se pudo encontrar la imagen seleccionada.');
+        }
+      } else {
+        imageUrl = widget.existingService?['imageUrl'];
       }
 
       final serviceData = {
@@ -227,31 +312,34 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         'isPaymentAdvance': _isPaymentAdvance,
         'paymentPercentage': _paymentPercentageController.text,
         'availability': _availability,
-        'providerId': widget.userUid, // Asociar el UID del proveedor
-        'imageUrl': imageUrl, // Añadir el enlace de la imagen
+        'providerId': widget.userUid,
+        'imageUrl': imageUrl,
       };
 
-      // Llama a la función para guardar el servicio en un servicio separado
-      await ServiceService().createService(serviceData);
+      if (widget.isEditing) {
+        if (_serviceId == null || _serviceId!.isEmpty) {
+          throw Exception('El ID del servicio no se proporcionó.');
+        }
 
-      // Navegar a la pantalla de confirmación
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ConfirmationScreen(
-            mensaje: '¡El servicio ha sido creado con éxito!',
-            icono: Icons.check_circle,
-            onButtonPressed: () {
-              Navigator.pop(context); // Cerrar la pantalla de confirmación
-              Navigator.pop(
-                  context); // Volver atrás a la lista de servicios o pantalla principal
-            },
-          ),
-        ),
-      );
+        final docRef =
+            FirebaseFirestore.instance.collection('servicios').doc(_serviceId);
+        final docSnapshot = await docRef.get();
+
+        if (!docSnapshot.exists) {
+          throw Exception('El servicio no existe o fue eliminado.');
+        }
+
+        await docRef.update(serviceData);
+        _showSuccessDialog('¡Servicio actualizado con éxito!');
+      } else {
+        await FirebaseFirestore.instance
+            .collection('servicios')
+            .add(serviceData);
+        _showSuccessDialog('¡Servicio creado con éxito!');
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al guardar servicio: $e')),
+        SnackBar(content: Text('Error: $e')),
       );
     }
   }
@@ -261,9 +349,11 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF438ef9),
-        title: const Text('Agregar Servicio',
-            style: TextStyle(color: Colors.white)),
-        iconTheme: const IconThemeData(color: Colors.white), // Iconos en blanco
+        title: Text(
+          widget.isEditing ? 'Editar Servicio' : 'Agregar Servicio',
+          style: const TextStyle(color: Colors.white),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -279,11 +369,29 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                 ),
                 child: Center(
                   child: _selectedImage != null
-                      ? Image.file(File(_selectedImage!.path),
-                          fit: BoxFit.cover)
-                      : const Text(
-                          'Subir Imagen (JPG, PNG, JPEG) (obligatorio)',
-                          style: TextStyle(color: Colors.black54)),
+                      // Mostrar imagen seleccionada localmente
+                      ? Image.file(
+                          File(_selectedImage!.path),
+                          fit: BoxFit.cover,
+                        )
+                      // Si está en edición, mostrar la imagen remota desde la URL
+                      : widget.isEditing &&
+                              widget.existingService?['imageUrl'] != null
+                          ? Image.network(
+                              widget.existingService!['imageUrl'],
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Text(
+                                  'Error al cargar imagen',
+                                  style: TextStyle(color: Colors.red),
+                                );
+                              },
+                            )
+                          // Texto por defecto si no hay imagen
+                          : const Text(
+                              'Subir Imagen (JPG, PNG, JPEG) (obligatorio)',
+                              style: TextStyle(color: Colors.black54),
+                            ),
                 ),
               ),
             ),
@@ -446,8 +554,10 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
             SizedBox(
               width: double.infinity,
               child: CustomButton(
-                text: 'Guardar Servicio',
-                onPressed: _saveService,
+                text: widget.isEditing
+                    ? 'Actualizar Servicio'
+                    : 'Guardar Servicio',
+                onPressed: _showConfirmationDialog,
                 type: ButtonType.PRIMARY,
               ),
             ),

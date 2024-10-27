@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:workiway/widgets/service_card.dart';
+import 'package:workiway/widgets/service_detail_screen.dart';
 import 'add_service_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -75,24 +76,46 @@ class ProviderServicesScreen extends StatelessWidget {
                       snapshot.data!.docs[index].data() as Map<String, dynamic>;
 
                   // Obtener la URL de la foto de perfil del proveedor
-                  final providerImageUrl = providerData?['fotoPerfil'] ??
-                      ''; // Obtener foto del proveedor
+                  final providerImageUrl = providerData?['fotoPerfil'] ?? '';
 
-                  // Construir el nombre del proveedor a partir de los datos del proveedor
+                  // Construir el nombre del proveedor
                   final providerName = providerData != null
                       ? '${providerData['nombre'] ?? ''} ${providerData['apellidos'] ?? ''}'
                           .trim()
                       : 'Sin nombre';
 
-                  return ServiceCard(
-                    category: service['category'] ?? 'Sin categoría',
-                    title: service['name'] ?? 'Sin título',
-                    price: (service['price']?.toDouble() ?? 0.0),
-                    modality: service['paymentModalidad'] ?? 'Sin modalidad',
-                    providerName:
-                        providerName.isNotEmpty ? providerName : 'Sin nombre',
-                    imageUrl: service['imageUrl'] ?? '',
-                    providerImageUrl: providerImageUrl,
+                  // Envolver la carta en InkWell para detectar toques
+                  return InkWell(
+                    onTap: () {
+                      final docId = snapshot
+                          .data!.docs[index].id; // Obtener el ID del documento
+                      final service = snapshot.data!.docs[index].data()
+                          as Map<String, dynamic>;
+                      // Navegar a la pantalla de detalles del servicio al hacer clic
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ServiceDetailScreen(
+                            serviceData: {
+                              ...service,
+                              'id': docId, // Pasar el ID del documento
+                              'providerName': providerName,
+                              'providerImageUrl': providerImageUrl,
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                    child: ServiceCard(
+                      category: service['category'] ?? 'Sin categoría',
+                      title: service['name'] ?? 'Sin título',
+                      price: (service['price']?.toDouble() ?? 0.0),
+                      modality: service['paymentModalidad'] ?? 'Sin modalidad',
+                      providerName:
+                          providerName.isNotEmpty ? providerName : 'Sin nombre',
+                      imageUrl: service['imageUrl'] ?? '',
+                      providerImageUrl: providerImageUrl,
+                    ),
                   );
                 },
               );
@@ -106,7 +129,7 @@ class ProviderServicesScreen extends StatelessWidget {
   // Método para obtener los datos del proveedor
   Future<Map<String, dynamic>?> _getProviderData(String uid) async {
     final snapshot = await FirebaseFirestore.instance
-        .collection('proveedores') // Cambiar a 'proveedores'
+        .collection('proveedores')
         .doc(uid)
         .get();
 

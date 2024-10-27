@@ -11,5 +11,16 @@ class ProductService {
     }
   }
 
-  // Aquí puedes agregar métodos adicionales relacionados con la colección de productos
+  // Método para actualizar un producto existente
+  Future<void> updateProduct(
+      String productId, Map<String, dynamic> productData) async {
+    try {
+      await _firestore
+          .collection('productos')
+          .doc(productId)
+          .update(productData);
+    } catch (e) {
+      throw Exception('Error al actualizar el producto: $e');
+    }
+  }
 }

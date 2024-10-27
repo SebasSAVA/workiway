@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:workiway/widgets/product_card.dart'; // Asegúrate de crear este widget también
+import 'package:workiway/widgets/product_detail_sreen.dart';
 import 'add_product_screen.dart'; // Asegúrate de importar la pantalla para agregar productos
 
 class ProviderProductsScreen extends StatelessWidget {
@@ -72,26 +73,49 @@ class ProviderProductsScreen extends StatelessWidget {
                       snapshot.data!.docs[index].data() as Map<String, dynamic>;
 
                   // Obtener la URL de la foto de perfil del proveedor
-                  final providerImageUrl = providerData?['fotoPerfil'] ??
-                      ''; // Obtener foto del proveedor
+                  final providerImageUrl = providerData?['fotoPerfil'] ?? '';
 
-                  // Construir el nombre del proveedor a partir de los datos del proveedor
+                  // Construir el nombre del proveedor
                   final providerName = providerData != null
                       ? '${providerData['nombre'] ?? ''} ${providerData['apellidos'] ?? ''}'
                           .trim()
                       : 'Sin nombre';
 
-                  return ProductCard(
-                    category: product['category'] ?? 'Sin categoría',
-                    title: product['name'] ?? 'Sin título', // Cambiado a 'name'
-                    price: product['price']?.toDouble() ?? 0.0,
-                    condition: product['condition'] ?? 'Sin condición',
-                    providerName:
-                        providerName.isNotEmpty ? providerName : 'Sin nombre',
-                    imageUrl: product['imageUrl'] ?? '',
-                    providerImageUrl: providerImageUrl,
-                    stock: product['stock'] ??
-                        0, // Asegúrate de que este campo exista en tu base de datos
+                  // Envolver la tarjeta de producto en InkWell para detectar toques
+                  return InkWell(
+                    onTap: () {
+                      final docId = snapshot
+                          .data!.docs[index].id; // Obtener el ID del producto
+                      final product = snapshot.data!.docs[index].data()
+                          as Map<String, dynamic>;
+
+                      // Navegar a la pantalla de detalles del producto al hacer clic
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ProductDetailScreen(
+                            productData: {
+                              ...product,
+                              'id': docId, // Pasar el ID del producto
+                              'providerName': providerName,
+                              'providerImageUrl': providerImageUrl,
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                    child: ProductCard(
+                      category: product['category'] ?? 'Sin categoría',
+                      title: product['name'] ?? 'Sin título',
+                      price: (product['price']?.toDouble() ?? 0.0),
+                      condition: product['condition'] ?? 'Sin condición',
+                      providerName:
+                          providerName.isNotEmpty ? providerName : 'Sin nombre',
+                      imageUrl: product['imageUrl'] ?? '',
+                      providerImageUrl: providerImageUrl,
+                      stock: product['stock'] ??
+                          0, // Asegúrate de que este campo esté en la BD
+                    ),
                   );
                 },
               );

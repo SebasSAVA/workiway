@@ -118,13 +118,13 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                           );
                         },
                       ),
-                      ProfileOption(
-                        icon: Icons.monetization_on,
-                        text: 'Información de Cobro',
-                        onTap: () {
-                          print('Información de Cobro');
-                        },
-                      ),
+                      //ProfileOption(
+                      //icon: Icons.monetization_on,
+                      //text: 'Información de Cobro',
+                      //onTap: () {
+                      //  print('Información de Cobro');
+                      //},
+                      //),
                       ProfileOption(
                         icon: Icons.exit_to_app,
                         text: 'Cerrar sesión',
