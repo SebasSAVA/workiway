@@ -32,17 +32,9 @@ class ServiceDetailScreen extends StatelessWidget {
               mensaje: '¡Servicio eliminado con éxito!',
               icono: Icons.check_circle,
               onButtonPressed: () {
-                // Navegar a ProviderServicesScreen al hacer clic en el botón de confirmación
-                Navigator.of(parentContext).pushAndRemoveUntil(
-                  MaterialPageRoute(
-                    builder: (context) => ProviderServicesScreen(
-                      userUid: serviceData[
-                          'providerId'], // Pasar el UID del proveedor si es necesario
-                    ),
-                  ),
-                  (Route<dynamic> route) =>
-                      false, // Eliminar todas las pantallas anteriores
-                );
+                Navigator.of(context).pop(); // Cierra el diálogo
+                Navigator.of(parentContext)
+                    .pop(); // Regresa a la pantalla anterior
               },
             ),
           ),

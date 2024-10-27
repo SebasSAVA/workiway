@@ -31,7 +31,9 @@ class ProductDetailScreen extends StatelessWidget {
               mensaje: '¡Producto eliminado con éxito!',
               icono: Icons.check_circle,
               onButtonPressed: () {
-                Navigator.popUntil(parentContext, (route) => route.isFirst);
+                Navigator.of(context).pop(); // Cierra el diálogo
+                Navigator.of(parentContext)
+                    .pop(); // Regresa a la pantalla anterior
               },
             ),
           ),

@@ -139,6 +139,43 @@ class _AddProductScreenState extends State<AddProductScreen> {
     return isValid;
   }
 
+  void _showConfirmationDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ConfirmationDialogWithButtons(
+          mensaje: widget.isEditing
+              ? '¿Estás seguro de que deseas actualizar este producto?'
+              : '¿Estás seguro de que deseas crear este producto?',
+          icono: Icons.warning,
+          onAcceptPressed: () async {
+            Navigator.of(context).pop(); // Cerrar el diálogo
+            await _saveProduct(); // Llamar al guardado o actualización
+          },
+          onCancelPressed: () {
+            Navigator.of(context).pop(); // Cerrar el diálogo
+          },
+        );
+      },
+    );
+  }
+
+  void _showSuccessDialog(String mensaje) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ConfirmationScreen(
+          mensaje: mensaje,
+          icono: Icons.check_circle,
+          onButtonPressed: () {
+            Navigator.of(context).pop(); // Cerrar el diálogo de éxito
+            Navigator.pop(context); // Volver a la pantalla anterior
+          },
+        );
+      },
+    );
+  }
+
   Future<void> _saveProduct() async {
     if (!_validateFields()) return;
     print('Intentando guardar o actualizar el producto...');
@@ -199,43 +236,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
         SnackBar(content: Text('Error: $e')),
       );
     }
-  }
-
-  void _showConfirmationDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return ConfirmationDialogWithButtons(
-          mensaje: widget.isEditing
-              ? '¿Estás seguro de que deseas actualizar este producto?'
-              : '¿Estás seguro de que deseas crear este producto?',
-          icono: Icons.warning,
-          onAcceptPressed: () async {
-            Navigator.of(context).pop(); // Cerrar el diálogo
-            await _saveProduct(); // Llamar al guardado o actualización
-          },
-          onCancelPressed: () {
-            Navigator.of(context).pop(); // Cerrar el diálogo
-          },
-        );
-      },
-    );
-  }
-
-  void _showSuccessDialog(String mensaje) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return ConfirmationScreen(
-          mensaje: mensaje,
-          icono: Icons.check_circle,
-          onButtonPressed: () {
-            Navigator.of(context).pop(); // Cerrar el diálogo de éxito
-            Navigator.pop(context); // Volver a la pantalla anterior
-          },
-        );
-      },
-    );
   }
 
   @override
